@@ -7,4 +7,4 @@
 
 仅供参考
 
-/Sigma
+$ \sigma$
