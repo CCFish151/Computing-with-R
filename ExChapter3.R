@@ -145,8 +145,8 @@ simu.cpoigamma = function(lambda,shape,scale,size,t)
   ##理论值
   mthe <- lambda*t*shape*scale
   vthe <- lambda*t*(shape+1)*shape*scale^2
-  show = data.frame(msim,vsim,mthe,vthe)
-  return(show)
+  showdata = data.frame(msim,vsim,mthe,vthe)
+  return(showdata)
 }
 ##调整参数进行测试
 simu.cpoigamma(2,1,2,10000,10)
