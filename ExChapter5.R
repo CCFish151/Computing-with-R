@@ -87,7 +87,7 @@ image_Ratio(1.4)
 legend("topright",legend = c("g/f1" ," g/f2"),lty = c(1,1),col = c("red","blue"))
 ### f2更为"靠近"g，因此猜测其方差相对更小
 
-#5.14
+#5.14 ##以为要做 实际不需要
 ##进行重要抽样计算
 theta.hat <- se <- numeric(3)
 m <- 10000
