@@ -104,31 +104,47 @@ names(power) <- c("small", "medium", "large")
 power
 
 #6.9 Gini Ratio calculate
-## care = mean(default)|median|deciles
-## 添加可选分布参数，将随机嵌入函数中
-Gini.cal = function(num.sample, num.repeat, distribution, care = "mean") {
+library(purrr) #get rbernoulli
+## distribution = lnorm|unif|bernoulli
+Gini.cal = function(num.sample, num.repeat, distribution = "unif") {
     gini.sam <- numeric(num.repeat)
-    m <- length(sample)
     
-    order.sam <- sort(sample)#获得次序统计量
-    order <- rep(1:m)
     gini.sam <- replicate(num.repeat, expr = {
-        tem <- (2*order-m-1)*order.sam
-        sum(tem)/(m^2 * mean(sample))
+        sample <- switch(distribution,
+                         lnorm = rlnorm(num.sample, 0, 1),
+                         unif = runif(num.sample),
+                         bernoulli = as.integer(rbernoulli(num.sample, 0.1)),
+                         warning("can't find such distribution")) #增加分布类型或调整参数请修改这里
+        order.sam <- sort(sample)#获得次序统计量
+        order <- rep(1:num.sample)
+        
+        tem <- (2*order-num.sample-1)*order.sam
+        sum(tem)/(num.sample^2 * mean(sample))
     })
     
     gini.order <- sort(gini.sam)
     
-    if (care == "deciles") result <- mean(c(gini.order[round(num.repeat/10)],gini.order[round(num.repeat/10)+1]))
-    else if (care == "median") result <- median(gini.order)
-    else result <- mean(gini.sam)
+    result1 <- mean(c(gini.order[round(num.repeat/10)],gini.order[round(num.repeat/10)+1]))
+    result2 <- median(gini.order) ##median
+    result3 <- mean(gini.sam, na.rm = TRUE)  ##mean
     
-    return(result)
+    return(list(mean = result3, median = result2, deciles = result1))
 }
 
+dis <- c("lnorm","unif","bernoulli")
+##按照题目要求计算各分布基尼系数
+Gini.hat <- as.data.frame(mapply(Gini.cal, 20, 10000, distribution = dis, USE.NAMES = TRUE),
+                          row.name = c("mean","median","deciles"))
+names(Gini.hat) <- dis
+
+#6.A
 
 
 
+
+
+
+#6.B
 
 
 
