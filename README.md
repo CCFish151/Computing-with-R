@@ -1,10 +1,10 @@
 # Computing with R
 主要内容为统计计算课程作业
 
-### Chapter 3
-the file "ExChapter3" includes 3.3 3.4 3.9 3.11 3.13 3.14 3.16 3.20
+### Ex开头 .R结尾的文件为R语言代码
 
-### Chapter 5
-the file "ExChapter5" includes  5.3 5.6 5.7 5.11 5.13 5.14 5.15
+### .md 结尾的为各部分的实验报告
 
-*仅供参考*
+*或许有人会想参考参考*
+
+*但是仅供参考*
