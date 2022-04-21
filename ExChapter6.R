@@ -55,14 +55,26 @@ plot(2:m, cov.rate[-1], type = "n",
 abline(h=0.95, col = "gray")
 lines(2:m, cov.rate[-1], lwd = 1.5)
 
-#6.5##?``
-##Example6.4中置信上界为7.224
-n <- 20
-m <- 1000000
-alpha <- .05
-x <- rchisq(n, df = 2)
-UCL = mean(replicate(m,expr = (n-1)*var(x)/qchisq(alpha, df = n-1)))
+#6.5
+##calculate experience conf.level
+expCL = function(n, m, alpha, var = TRUE) {
+    
+    CI.var <- function(n,alpha) {
+        x <- rchisq(n, df = 2)
+        return((n-1) * var(x)/4 > qchisq(alpha, df = n-1))}
+    CI.t <- function(n,alpha) {
+        x <- rchisq(n, df = 2)
+        return((mean(x)-2)/sqrt(var(x)/n) > qt(alpha, df = n-1))
+    }
+    
+    if (!var) UCL<-replicate(m,expr=CI.t(n=20,alpha=.05))
+    else  UCL<-replicate(m,expr=CI.var(n=20,alpha=.05))
+    
+    return(mean(UCL))
+}
 
+ucls.var <- expCL(100,100000,.05)
+ucls.t <- expCL(100,100000,.05,var = FALSE)
 
 #6.8
 ## var2test提供了两样本方差检验的两种方法
@@ -138,14 +150,82 @@ Gini.hat <- as.data.frame(mapply(Gini.cal, 20, 10000, distribution = dis, USE.NA
 names(Gini.hat) <- dis
 
 #6.A
+emIerror = function(n,m,alpha,population) {
+    ##计算经验I型错误率
+    p <- numeric(m) #storage for p-values
+    p <- replicate(m, expr = {
+        sample <- switch(population,
+                         chisq = rchisq(n, df = 1),
+                         unif = runif(n,0,2),
+                         exp = rexp(n),
+                         warning("can't find such population"))
+        ttest <- t.test(sample, alternative = "two.sided", mu = 1)
+        p <- ttest$p.value
+    })
+    
+    p.hat <- mean(p < alpha)
+    return(p.hat)
+}
 
-
-
-
+#example
+Iunif <- emIerror(100,1000000,.05,"unif")
+Ichisq <- emIerror(100,1000000,.05,"chisq")
+Iexp <- emIerror(100,1000000,.05,"exp")
 
 
 #6.B
+library(MASS)
+##Question One
+mean <- c(2,1)
+sigma <- matrix(c(1,0.5,0.5,1),nrow = 2,ncol = 2)
+n <- 20
+m <- 10000
+alpha <- .05
+##生成符合条件随机数
+munorm = function(n, mu, Sigma)
+{
+    d <- length(mu)
+    Q <- chol(Sigma) 
+    Z <- matrix(rnorm(n*d), nrow=n, ncol=d)
+    X <- Z %*% Q + matrix(mu, n, d, byrow=TRUE)
+    return(X)
+}
 
+#二元正态随机变量相关性检验功效
+corPower1 = function(m, n, mean, sigma, method) {
+    power <- mean(replicate(m, expr = {
+        sample <- munorm(n, mean, sigma) #生成二元正态分布
+        x <- sample[,1]
+        y <- sample[,2]
+        result <- cor.test(x,y, alternative = "two.sided",
+                           method = method, conf.level = 0.95)
+        result$p.value <= alpha
+    }))
+    return(power)
+}
+
+pearson.result1 <- corPower1(m, n, mean, sigma, "pearson")
+spearman.result1 <- corPower1(m, n, mean, sigma, "spearman")
+kendall.result1 <- corPower1(m, n, mean, sigma, "kendall")
+
+##Question two
+corPower2 = function(m, n, mean, sigma, method) {
+    power <- mean(replicate(m, expr = {
+        x <- rcauchy(n)
+        z1 <- rnorm(n, -10, sqrt(2))
+        z2 <- rnorm(n, 4, sqrt(2))
+        z3 <- rnorm(n, 20, 1)
+        y <- 0.001*x+z1+z2+z3
+        result <- cor.test(x,y, alternative = "two.sided",
+                           method = method, conf.level = 0.95)
+        result$p.value <= alpha
+    }))
+    return(power)
+}
+
+pearson.result2 <- corPower2(m, n, mean, sigma, "pearson")
+spearman.result2 <- corPower2(m, n, mean, sigma, "spearman")
+kendall.result2 <- corPower2(m, n, mean, sigma, "kendall")
 
 
 
