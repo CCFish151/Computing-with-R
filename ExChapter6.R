@@ -1,6 +1,6 @@
 #EX6.3
-Power.t = function(n, mu0 = 500, sigma = 1000, mu) { 
-    ##计算t检验功效,n代表样本数量
+Power.t = function(n, mu0 = 500, sigma = 100, mu) { 
+##计算t检验功效,n代表样本数量,注意sigma输入标准差
     m <- 1000
     M <- length(mu)
     power <- numeric(M)
@@ -35,7 +35,7 @@ for (i in 1:5) {
 }
 ##添加图例
 legend("topleft",legend = c("n=10", "n=20", "n=30", "n=40", "n=50"),
-       lty = type, col = color)
+       lty = type, col = color, cex = .8)
 
 
 #6.4

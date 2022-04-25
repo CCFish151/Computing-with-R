@@ -31,7 +31,7 @@ $$
 首先，编写计算t-test功效的函数` Power.t`，其实现如下（或直接利用`Power.t.test`）
 
 ```R
-Power.t = function(n, mu0 = 500, sigma = 1000, mu) { 
+Power.t = function(n, mu0 = 500, sigma = 100, mu) { 
     ##计算t检验功效,n代表样本数量
     m <- 1000
     M <- length(mu)
@@ -40,7 +40,7 @@ Power.t = function(n, mu0 = 500, sigma = 1000, mu) {
     for (i in 1:M) {
         mu1 <- mu[i]
         ##计算检验的p值并与显著性水平比较
-        pvalues <- replicate(m,expr = {
+        pvalues <- replicate(m, expr = {
             x <- rnorm(n, mean = mu1, sd = sigma)
             ttest <- t.test(x, alternative = "greater", mu = mu0)
             ttest$p.value})
@@ -82,7 +82,7 @@ legend("topleft",legend = c("n=10", "n=20", "n=30", "n=40", "n=50"),
 
 代码运行绘制图象如下显示，其中`n`代表样本数量。
 
-![Power Curves](D:\统计计算\RPractice\作业3\image\PowerCurve.jpeg)
+![Power Curves](D:\统计计算\RPractice\作业3\image\PowerCurve .jpeg)
 
 由图像可以看出，随着样本数量的增加，检验的功效随之增加；同时随着`mu`的增加，功效也增加。
 
